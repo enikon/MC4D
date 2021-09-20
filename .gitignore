@@ -1,3 +1,4 @@
 .gradle/
 local.properties
 .idea/
+MC4D/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
