@@ -2,3 +2,5 @@
 local.properties
 .idea/
 MC4D/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+AndroidUtils/build/
+MC4D/build/
