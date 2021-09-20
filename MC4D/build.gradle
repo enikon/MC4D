@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 8
+    compileSdkVersion 30
     buildToolsVersion "19.1.0"
 
     defaultConfig {
         applicationId "com.superliminal.magiccube4d"
         minSdkVersion 8
-        targetSdkVersion 8
+        targetSdkVersion 30
     }
 
     buildTypes {
@@ -16,6 +16,6 @@ android {
     }
 }
 
-dependencies {
-    compile project(':AndroidUtils')
-}
+//dependencies {
+//    project(':AndroidUtils')
+//}
