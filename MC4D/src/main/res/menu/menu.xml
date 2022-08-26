@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Save" android:id="@+id/save">
+        <menu>
+            <item android:title="Save: Slot 1" android:id="@+id/save_slot_1"></item>
+            <item android:title="Save: Slot 2" android:id="@+id/save_slot_2"></item>
+            <item android:title="Save: Slot 3" android:id="@+id/save_slot_3"></item>
+            <item android:title="Save: Slot 4" android:id="@+id/save_slot_4"></item>
+            <item android:title="Save: Slot 5" android:id="@+id/save_slot_5"></item>
+        </menu>
+    </item>
+    <item android:title="Load" android:id="@+id/load">
+        <menu>
+            <item android:title="Load: Slot 1" android:id="@+id/load_slot_1"></item>
+            <item android:title="Load: Slot 2" android:id="@+id/load_slot_2"></item>
+            <item android:title="Load: Slot 3" android:id="@+id/load_slot_3"></item>
+            <item android:title="Load: Slot 4" android:id="@+id/load_slot_4"></item>
+            <item android:title="Load: Slot 5" android:id="@+id/load_slot_5"></item>
+        </menu>
+    </item>
+    <item android:title="Scramble" android:id="@+id/scramble">
+        <menu>
+            <item android:title="Scramble Full (New Game)" android:id="@+id/scramble_full"></item>
+            <item android:title="Scramble 1" android:id="@+id/scramble_1"></item>
+            <item android:title="Scramble 2" android:id="@+id/scramble_2"></item>
+            <item android:title="Scramble 3" android:id="@+id/scramble_3"></item>
+        </menu>
+    </item>
+    <item android:title="Settings" android:id="@+id/settings">
+        <menu>
+            <item android:title="Colors" android:id="@+id/colors"></item>
+            <item android:title="Controls" android:id="@+id/controls"></item>
+            <item android:title="Adjustments" android:id="@+id/adjustments"></item>
+        </menu>
+    </item>
+    <item android:title="Solve" android:id="@+id/solve">
+        <menu>
+            <item android:title="Solve - Reset" android:id="@+id/solve_reset"></item>
+            <item android:title="Solve - Step by Step" android:id="@+id/solve_step"></item>
+        </menu>
+    </item>
+    <item android:title="About" android:id="@+id/about">
+        <menu>
+            <item android:title="About..." android:id="@+id/about_orig" android:icon="@android:drawable/ic_menu_info_details"></item>
+            <item android:title="About modification" android:id="@+id/about_mod"></item>
+        </menu>
+    </item>
+    <item android:title="Send Log" android:id="@+id/send_log">
+
+    </item>
+</menu>

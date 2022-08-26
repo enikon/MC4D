@@ -165,13 +165,7 @@ public class MC4DAndroid extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.scramble1, menu);
-        inflater.inflate(R.menu.scramble2, menu);
-        inflater.inflate(R.menu.scramble3, menu);
-        inflater.inflate(R.menu.full, menu);
-        inflater.inflate(R.menu.solve, menu);
-        inflater.inflate(R.menu.send, menu);
-        inflater.inflate(R.menu.about, menu);
+        inflater.inflate(R.menu.menu, menu);
         return true;
     }
 
@@ -183,7 +177,7 @@ public class MC4DAndroid extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.item01:
+            case R.id.about_orig:
                 String appNameStr = getString(R.string.app_name) + " ";
                 try {
                     appNameStr += "v" + getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName + " ";
@@ -200,22 +194,25 @@ public class MC4DAndroid extends Activity {
                         "<br><br>Send all questions and comments to <a href=\"mailto:feedback@superliminal.com\">feedback@superliminal.com</a>";
                 DialogUtils.showHTMLDialog(this, html);
                 break;
-            case R.id.item02:
+            case R.id.scramble_1:
                 scramble(1);
                 break;
-            case R.id.item03:
+            case R.id.scramble_2:
                 scramble(2);
                 break;
-            case R.id.item04:
+            case R.id.scramble_3:
                 scramble(3);
                 break;
-            case R.id.item05:
+            case R.id.scramble_full:
                 scramble(FULLY);
                 break;
-            case R.id.item06:
+            case R.id.solve_reset:
+                scramble(0);
+                break;
+            case R.id.solve_step:
                 solve();
                 break;
-            case R.id.item07:
+            case R.id.send_log:
                 sendLog(new File(getFilesDir(), MagicCube.LOG_FILE));
                 break;
             default:
@@ -287,7 +284,10 @@ public class MC4DAndroid extends Activity {
             //System.out.println("Adding scramble twist grip: " + iGrip + " dir: " + dir + " slicemask: " + slicemask);
         }
         mHist.mark(History.MARK_SCRAMBLE_BOUNDARY);
-        mScrambleState = scramblechenfrengensen == -1 ? ScrambleState.FULL : ScrambleState.FEW;
+        mScrambleState = scramblechenfrengensen == -1 ? ScrambleState.FULL : (
+                        scramblechenfrengensen == 0 ? ScrambleState.NONE :
+                        ScrambleState.FEW
+        );
         mIsScrambling = false;
     } // end scramble
 
