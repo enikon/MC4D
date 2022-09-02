@@ -1,9 +1,13 @@
 package com.superliminal.magiccube4d;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,10 +17,16 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
+import com.azeesoft.lib.colorpicker.ColorPickerDialog;
+import com.cyanheron.magiccube4d.gui.ColorPickTableDialogFragment;
+import com.cyanheron.magiccube4d.gui.MC4DPreferencesManager;
+import com.cyanheron.magiccube4d.gui.Utils;
 import com.superliminal.magiccube4d.MagicCube.InputMode;
+import com.superliminal.util.PropertyManager;
+import com.superliminal.util.android.Color;
 import com.superliminal.util.android.DialogUtils;
-import com.superliminal.util.android.EmailUtils;
 import com.superliminal.util.android.Graphics;
 
 import java.io.BufferedReader;
@@ -42,6 +52,7 @@ public class MC4DAndroid extends Activity {
     private enum ScrambleState { NONE, FEW, FULL }
     private ScrambleState mScrambleState = ScrambleState.NONE;
     private boolean mIsScrambling = false;
+    private MC4DPreferencesManager mPreferencesManager;
 
     private void initMode(int id, final InputMode mode) {
         RadioButton rb = (RadioButton) findViewById(id);
@@ -85,16 +96,39 @@ public class MC4DAndroid extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+
         setContentView(R.layout.main);
         //setContentView(R.layout.main); // For debugging only.
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
         mPuzzleManager = new PuzzleManager(MagicCube.DEFAULT_PUZZLE, /* MagicCube.DEFAULT_LENGTH */EDGE_LENGTH, new ProgressView());
         File log_file = new File(getFilesDir(), MagicCube.LOG_FILE);
         view = new MC4DAndroidView(getApplicationContext(), mPuzzleManager, mHist);
-        boolean readOK = readLog(log_file);
+
         //addContentView(view, params);
         ViewGroup holder = (ViewGroup) findViewById(R.id.puzzle_holder);
+        ViewGroup twistors = (ViewGroup) findViewById(R.id.twistors);
         holder.addView(view, params);
+
+        mPreferencesManager = new MC4DPreferencesManager(
+            getApplicationContext(), mPuzzleManager.faceColors,
+                new Color[]{
+                        mPuzzleManager.bgColor,
+                        mPuzzleManager.activeColor,
+                },
+                (colors, colors2) -> {
+                    mPuzzleManager.faceColors = colors;
+                    mPuzzleManager.bgColor = colors2[0];
+                    holder.setBackgroundColor(colors2[0].intValue());
+                    twistors.setBackgroundColor(colors2[0].intValue());
+
+                    mPuzzleManager.activeColor = colors2[1];
+                    // Get property manager set ground
+                    view.invalidate();
+        }); // ColorUtils.generateVisuallyDistinctColors(puzzleDescription.nFaces(), .7f, .1f);
+
+        boolean readOK = readLog(log_file);
         initMode(R.id.D3, InputMode.ROT_3D);
         initMode(R.id.D4, InputMode.ROT_4D);
         initMode(R.id.twisting, InputMode.TWISTING);
@@ -211,6 +245,13 @@ public class MC4DAndroid extends Activity {
                 break;
             case R.id.solve_step:
                 solve();
+                break;
+            case R.id.colors:
+                FragmentTransaction ft = Utils.prepareDialog(this);
+                DialogFragment cptdf = ColorPickTableDialogFragment.newInstance(this.mPreferencesManager);
+                cptdf.show(ft, Utils.DIALOG_TAG);
+                break;
+            case R.id.adjustments:
                 break;
             case R.id.send_log:
                 sendLog(new File(getFilesDir(), MagicCube.LOG_FILE));
@@ -347,6 +388,7 @@ public class MC4DAndroid extends Activity {
             String schlafli = firstline[4];
             double initialLength = Double.parseDouble(firstline[5]);
             mPuzzleManager.initPuzzle(schlafli, "" + initialLength,  new ProgressView(), new Graphics.Label(), false);
+            mPreferencesManager.reloadColors();
             int iLength = (int) Math.round(initialLength);
             view.getRotations().read(reader);
             String title = MagicCube.TITLE;
@@ -386,7 +428,8 @@ public class MC4DAndroid extends Activity {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        EmailUtils.sendEmail(null, "MagicCube4D log file", text, this);
+        Toast.makeText(this, "CUSTOM MOD: Sending log", Toast.LENGTH_SHORT).show();
+        //EmailUtils.sendEmail(null, "MagicCube4D log file", text, this);
         return true;
     }
 

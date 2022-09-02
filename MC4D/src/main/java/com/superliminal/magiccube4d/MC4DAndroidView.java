@@ -1,11 +1,14 @@
 package com.superliminal.magiccube4d;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.cyanheron.magiccube4d.gui.MC4DConfig;
+import com.google.gson.Gson;
 import com.superliminal.magiccube4d.MagicCube.InputMode;
 import com.superliminal.util.PropertyManager;
 import com.superliminal.util.ResourceUtils;
@@ -17,8 +20,10 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.Arrays;
 
 public class MC4DAndroidView extends View {
     private boolean DEBUGGING = false;
@@ -49,13 +54,16 @@ public class MC4DAndroidView extends View {
                 // progressBar.setVisible(false);
                 // hist.clear((int)puzzleManager.puzzleDescription.getEdgeLength());
                 // updateTwistsLabel();
-                Color[] userColors = findColors(puzzleManager.puzzleDescription.nFaces(), MagicCube.FACE_COLORS_FILE);
-                if(userColors != null)
-                    puzzleManager.faceColors = userColors;
-                // if(view != null)
-                // view.repaint();
+                // Color[] userColors = findColors(puzzleManager.puzzleDescription.nFaces(), MagicCube.FACE_COLORS_FILE);
+                // puzzleManager.faceColors = userColors;
+
+            // if(view != null)
+            // view.repaint();
             }
         });
+
+
+
         animationQueue = new AnimationQueue(hist);
         this.setOnTouchListener(new OnTouchListener() {
             @Override
@@ -202,6 +210,7 @@ public class MC4DAndroidView extends View {
             }
         });
     } // end MC4DAndroidView()
+
 
     /**
      * Show an event in the LogCat view, for debugging.

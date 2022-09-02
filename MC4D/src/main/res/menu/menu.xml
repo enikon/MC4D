@@ -35,6 +35,7 @@
     </item>
     <item android:title="Solve" android:id="@+id/solve">
         <menu>
+            <item android:title="Reset View" android:id="@+id/solve_reset_view"></item>
             <item android:title="Solve - Reset" android:id="@+id/solve_reset"></item>
             <item android:title="Solve - Step by Step" android:id="@+id/solve_step"></item>
         </menu>
@@ -45,7 +46,9 @@
             <item android:title="About modification" android:id="@+id/about_mod"></item>
         </menu>
     </item>
-    <item android:title="Send Log" android:id="@+id/send_log">
-
+    <item android:title="Share" android:id="@+id/share">
+        <menu>
+            <item android:title="Send Log" android:id="@+id/send_log"/>
+        </menu>
     </item>
 </menu>

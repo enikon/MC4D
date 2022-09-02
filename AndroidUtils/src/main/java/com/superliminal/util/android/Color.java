@@ -31,7 +31,13 @@ public class Color {
 		this.g = g;
 		this.b = b;
 	}
-	
+
+	public Color(int c){
+		this.r = ((c >> 16) & 0xff) / 255f;
+		this.g = ((c >> 8) & 0xff) / 255f;
+		this.b = ((c >> 0) & 0xff) / 255f;
+	}
+
 	public Color() {
 		r = g = b = 0;
 	}

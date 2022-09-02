@@ -740,7 +740,9 @@ public class PipelineUtils
 			Color faceColors[],
 			int iStickerUnderMouse,
 			boolean highlightByCubie,
-			Color outlineColor)
+			Color outlineColor,
+            Color activeColor
+            )
     {
         if (verboseLevel >= 2) System.out.println("    in PipelineUtils.paintFrame");
         if (verboseLevel >= 2) System.out.println("        iStickerUnderMouse = "+iStickerUnderMouse);
@@ -816,7 +818,7 @@ public class PipelineUtils
                 boolean highlight = highlightByCubie ? sticker2cubie[iSticker]==iCubieUnderMouse
                                                      : iSticker==iStickerUnderMouse;
                 if(highlight)
-                    stickercolor = Color.white; //stickercolor.brighter().brighter();
+                    stickercolor = activeColor;  //stickercolor.brighter().brighter();
 
                 g.setColor(isShadows ? shadowcolor : stickercolor);
                 g.fillPolygon(xs, ys, poly.length);

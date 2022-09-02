@@ -1,6 +1,7 @@
 .gradle/
-local.properties
+gradle/
 .idea/
-MC4D/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+*.iml
 AndroidUtils/build/
 MC4D/build/
+local.properties

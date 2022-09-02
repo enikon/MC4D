@@ -28,6 +28,8 @@ public class PuzzleManager {
     public PuzzleDescription puzzleDescription = null;
     public int puzzleState[] = null;
     public Color faceColors[];
+    public Color activeColor = new Color(0xd0d0d0);
+    public Color bgColor = new Color(0x303030);
 
     /**
      * Reinitializes the puzzleState array of color indices.
@@ -506,16 +508,18 @@ public class PuzzleManager {
         float twistFactor)
     {
         PipelineUtils.paintFrame(
-                g,
-                frame,
-                puzzleDescription,
-                puzzleState,
-                showShadows,
-                ground,
-                faceColors,
-                highlit ? iStickerUnderMouse : -1,
-                highlightByCubie,
-                outlineColor);
+            g,
+            frame,
+            puzzleDescription,
+            puzzleState,
+            showShadows,
+            ground,
+            faceColors,
+            highlit ? iStickerUnderMouse : -1,
+            highlightByCubie,
+            outlineColor,
+            activeColor
+        );
 
         if(iTwist < nTwist) {
             if(iTwist == 0) {

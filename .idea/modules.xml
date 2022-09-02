@@ -4,7 +4,13 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MC4D.iml" filepath="$PROJECT_DIR$/MC4D.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidUtils/MC4D.AndroidUtils.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.iml" filepath="$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.main.iml" filepath="$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/MC4D/MC4D.MC4D.unitTest.iml" />
     </modules>
   </component>
 </project>
