@@ -1,6 +1,6 @@
 package com.cyanheron.magiccube4d.gui;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MC4DConfig {
@@ -12,9 +12,13 @@ public class MC4DConfig {
         BACKGROUND, ACTIVE
     }
 
+    public static enum Adjustments{
+        VIEW_SCALE, FACE_SHRINK, STICKER_SHRINK, EYE_W_SCALE
+    }
+
     public static Map<FaceNames, Integer> faceToColorArrayIndex;
     static {
-        faceToColorArrayIndex = new HashMap<>();
+        faceToColorArrayIndex = new LinkedHashMap<>();
         faceToColorArrayIndex.put(FaceNames.FRONT, 2);
         faceToColorArrayIndex.put(FaceNames.BACK, 5);
         faceToColorArrayIndex.put(FaceNames.TOP, 0);
@@ -36,7 +40,7 @@ public class MC4DConfig {
     }
     public static Map<FaceNames, ColorsStruct> faceToColorTable;
     static {
-        faceToColorTable = new HashMap<>();
+        faceToColorTable = new LinkedHashMap<>();
         faceToColorTable.put(FaceNames.FRONT, new ColorsStruct(0, 0, "Front Face Color"));
         faceToColorTable.put(FaceNames.BACK, new ColorsStruct(1, 0, "Back Face Color"));
         faceToColorTable.put(FaceNames.TOP, new ColorsStruct(0, 1, "Top Face Color"));
@@ -48,14 +52,14 @@ public class MC4DConfig {
     }
     public static Map<Names, ColorsStruct>  nameToColorTable;
     static {
-        nameToColorTable = new HashMap<>();
+        nameToColorTable = new LinkedHashMap<>();
         nameToColorTable.put(Names.BACKGROUND, new ColorsStruct(0, 0, "Background Color"));
         nameToColorTable.put(Names.ACTIVE, new ColorsStruct(1, 0, "Active Element Color"));
     }
 
     public static Map<FaceNames, String> faceToColorPrefTag;
     static {
-        faceToColorPrefTag = new HashMap<>();
+        faceToColorPrefTag = new LinkedHashMap<>();
         faceToColorPrefTag.put(FaceNames.FRONT, "face_color_front");
         faceToColorPrefTag.put(FaceNames.BACK, "face_color_back");
         faceToColorPrefTag.put(FaceNames.TOP, "face_color_top");
@@ -67,9 +71,44 @@ public class MC4DConfig {
     }
     public static Map<Names, String>  nameToColorPrefTag;
     static {
-        nameToColorPrefTag = new HashMap<>();
+        nameToColorPrefTag = new LinkedHashMap<>();
         nameToColorPrefTag.put(Names.BACKGROUND, "color_background");
         nameToColorPrefTag.put(Names.ACTIVE, "color_active");
     }
+
+    public static Map<Adjustments, String>  adjustmentsToAdjustmentPrefTag;
+    static {
+        adjustmentsToAdjustmentPrefTag = new LinkedHashMap<>();
+        adjustmentsToAdjustmentPrefTag.put(Adjustments.VIEW_SCALE, "adjustment_scale");
+        adjustmentsToAdjustmentPrefTag.put(Adjustments.FACE_SHRINK, "adjustment_4D_scale");
+        adjustmentsToAdjustmentPrefTag.put(Adjustments.STICKER_SHRINK, "adjustment_3D_scale");
+        adjustmentsToAdjustmentPrefTag.put(Adjustments.EYE_W_SCALE, "adjustment_4D_fov");
+    }
+
+    public static class AdjustmentStruct{
+        public float minValue=0, maxValue=1;
+        public String name = "";
+        public String abbrev = "";
+        public String property = "";
+
+        public AdjustmentStruct(float minValue, float maxValue, String name,  String abbrev, String property){
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            this.name = name;
+            this.abbrev = abbrev;
+            this.property = property;
+        }
+    }
+
+    public static Map<Adjustments, AdjustmentStruct> adjustmentToAdjustmentTabs;
+    static {
+        adjustmentToAdjustmentTabs = new LinkedHashMap<>();
+        adjustmentToAdjustmentTabs.put(Adjustments.VIEW_SCALE, new AdjustmentStruct(0.25f, 2.5f, "Global Scale (XYZW-axes) \n (Whole hypercube scale)", "GSc", "scale"));
+        adjustmentToAdjustmentTabs.put(Adjustments.FACE_SHRINK, new AdjustmentStruct(0.25f, 1.0f, "Scale in 4D (W-axis) \n (Face scale)", "4DSc", "faceshrink"));
+        adjustmentToAdjustmentTabs.put(Adjustments.STICKER_SHRINK, new AdjustmentStruct(0f, 1f, "Scale in 3D (XYZ-axis) \n (Stickers scale)", "3DSc", "stickershrink"));
+        adjustmentToAdjustmentTabs.put(Adjustments.EYE_W_SCALE, new AdjustmentStruct(0.625f, 1.5f, "Field of view in 4D (W-axis) \n (Side faces distortion)", "4DFov", "eyew"));
+    }
+
+    //faceshrink stickershrink scale eyew
 
 }

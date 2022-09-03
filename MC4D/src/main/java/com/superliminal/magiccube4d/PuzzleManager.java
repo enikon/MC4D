@@ -383,6 +383,12 @@ public class PuzzleManager {
         boolean do3dStepsOnly,
         View view)
     {
+
+
+//        float faceShrink,
+//        float stickerShrink,
+        eyeZ = eyeZ + eyeZ * faceShrink;
+
         // steal PolygonManager's stuff-- this should be an interface but that's not allowed here apparently
         abstract class InterpFunc {
             public abstract float func(float f);
@@ -459,7 +465,7 @@ public class PuzzleManager {
         //float groundOffset = -1.f;
 
         // XXX why is this a bit diff from old?  well I don't think it was being done right for one thing
-        float[] groundNormal = showShadows ? new float[]{0, 1, .05f} : null;
+        float[] groundNormal = showShadows ? new float[]{0.15f, 0.85f, .05f} : null;
         float groundOffset = -1.f;
 
         // XXX I don't seem to be quite the same as the original... unless I correct it here

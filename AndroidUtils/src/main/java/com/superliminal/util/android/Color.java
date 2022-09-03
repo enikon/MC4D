@@ -55,8 +55,7 @@ public class Color {
 	}
 	
 	public static Color decode(String str) {
-		System.out.println("Color.decode() not yet implemented.");
-		return null;
+		return new Color(android.graphics.Color.parseColor(str));
 	}
 
 	public Color darker() {

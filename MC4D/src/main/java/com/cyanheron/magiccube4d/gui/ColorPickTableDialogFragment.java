@@ -1,12 +1,12 @@
 package com.cyanheron.magiccube4d.gui;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +14,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.GridLayout;
 
-import com.google.gson.Gson;
 import com.superliminal.magiccube4d.R;
 import com.superliminal.util.android.Color;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ColorPickTableDialogFragment extends DialogFragment {
 
-    public HashMap<String, Color> colors;
+    public LinkedHashMap<String, Color> colors;
     public MC4DPreferencesManager manager;
 
     public ColorPickTableDialogFragment(){
@@ -33,7 +31,7 @@ public class ColorPickTableDialogFragment extends DialogFragment {
     public static ColorPickTableDialogFragment newInstance(MC4DPreferencesManager manager) {
         ColorPickTableDialogFragment f = new ColorPickTableDialogFragment();
 //        Bundle args = new Bundle();
-//        ArrayList<HashMap> list = new ArrayList<>();
+//        ArrayList<LinkedHashMap> list = new ArrayList<>();
 //        args.putSerializable("colors", list);
 //        f.setArguments(args);
         f.manager = manager;
@@ -42,8 +40,8 @@ public class ColorPickTableDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        HashMap<String, Color> colors = (HashMap<String, Color>)(
-//                ((ArrayList<HashMap>)(savedInstanceState.getSerializable("colors"))).get(0)
+//        LinkedHashMap<String, Color> colors = (LinkedHashMap<String, Color>)(
+//                ((ArrayList<LinkedHashMap>)(savedInstanceState.getSerializable("colors"))).get(0)
 //            );
 
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -67,9 +65,6 @@ public class ColorPickTableDialogFragment extends DialogFragment {
             gl.addView(cpe, glp);
             //break;
         }
-
-
-
         return v;
     }
 
@@ -91,6 +86,7 @@ public class ColorPickTableDialogFragment extends DialogFragment {
             dialog.getWindow().setLayout(width, height);
         }
     }
+
 
     public ColorPickEntity makeFaceColorEntity(
             Context context,

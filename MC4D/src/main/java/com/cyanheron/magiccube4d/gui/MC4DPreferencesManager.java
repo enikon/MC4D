@@ -4,10 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.superliminal.util.PropertyManager;
 import com.superliminal.util.android.Color;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MC4DPreferencesManager {
@@ -19,31 +20,49 @@ public class MC4DPreferencesManager {
     public Color[] defaultColors;
     public Color[] colors;
 
-    public HashMap<MC4DConfig.Names, Color> nameColor;
-    public HashMap<MC4DConfig.Names, Color> defaultNameColor;
+    public LinkedHashMap<MC4DConfig.Names, Color> nameColor;
+    public LinkedHashMap<MC4DConfig.Names, Color> defaultNameColor;
+
+    public LinkedHashMap<MC4DConfig.Adjustments, Float> adjustmentValues;
+    public LinkedHashMap<MC4DConfig.Adjustments, Float> defaultAdjustmentValues;
 
     private OnColorsChange onColorsChange;
+    private OnAdjustmentsChange onAdjustmentsChange;
 
     public MC4DPreferencesManager(
             Context context,
             Color[] defaultColors,
             Color[] defaultNameColors,
-            OnColorsChange onColorsChange
+            Float[] defaultAdjustmentValues,
+            OnColorsChange onColorsChange,
+            OnAdjustmentsChange onAdjustmentsChange
+
     ){
         this.context = context;
         this.defaultColors = defaultColors;
         this.colors = Arrays.<Color>copyOf(this.defaultColors, this.defaultColors.length);
         this.onColorsChange = onColorsChange;
+        this.onAdjustmentsChange = onAdjustmentsChange;
         this.gson = new Gson();
         this.prefs = this.context.getSharedPreferences("mc4d", 0);
 
-
-        this.nameColor = new HashMap<>();
-        this.defaultNameColor = new HashMap<>();
+        this.nameColor = new LinkedHashMap<>();
+        this.defaultNameColor = new LinkedHashMap<>();
         for(MC4DConfig.Names n : MC4DConfig.Names.values()){
             this.defaultNameColor.put(n, defaultNameColors[n.ordinal()]);
         }
         this.reloadColors();
+
+        this.adjustmentValues = new LinkedHashMap<>();
+        this.defaultAdjustmentValues = new LinkedHashMap<>();
+        for(MC4DConfig.Adjustments n : MC4DConfig.Adjustments.values()){
+            this.defaultAdjustmentValues.put(n, defaultAdjustmentValues[n.ordinal()]);
+        }
+       this.reloadAdjustment();
+
+        PropertyManager.top.setProperty("twistfactor", "1f");
+        PropertyManager.top.setProperty("outlines", "true");
+        PropertyManager.top.setProperty("outlines.color", "#000000");
     }
 
     public void reloadColors(){
@@ -72,7 +91,7 @@ public class MC4DPreferencesManager {
 
             this.nameColor.put(entry.getKey(), color);
         }
-        performAction();
+        onColorChangeAction();
     }
 
     public Color getFaceColor(MC4DConfig.FaceNames key) {
@@ -82,7 +101,7 @@ public class MC4DPreferencesManager {
         return this.nameColor.get(key);
     }
 
-    public void performAction(){
+    public void onColorChangeAction(){
         this.onColorsChange.onColorsChanged(
                 this.colors, this.nameColor.values().toArray(new Color[this.nameColor.size()]));
     }
@@ -101,7 +120,7 @@ public class MC4DPreferencesManager {
             this.colors[ii] = color;
         }
         prefsed.apply();
-        performAction();
+        onColorChangeAction();
     }
 
     public void setNameColor(MC4DConfig.Names key, Color color) {
@@ -117,6 +136,45 @@ public class MC4DPreferencesManager {
             this.nameColor.put(key, color);
         }
         prefsed.apply();
-        performAction();
+        onColorChangeAction();
     }
+
+    public void onAdjustmentsChangeAction(){
+        this.onAdjustmentsChange.onAdjustmentsChanged(
+                this.adjustmentValues.values().toArray(
+                        new Float[this.adjustmentValues.size()]));
+    }
+
+    public void reloadAdjustment() {
+        for (Map.Entry<MC4DConfig.Adjustments, MC4DConfig.AdjustmentStruct> entry : MC4DConfig.adjustmentToAdjustmentTabs.entrySet()) {
+            String adjustmentJson = this.prefs.getString(
+                    MC4DConfig.adjustmentsToAdjustmentPrefTag.get(entry.getKey()),
+                    null);
+            Float value;
+            if (adjustmentJson == null)
+                value = this.defaultAdjustmentValues.get(entry.getKey());
+            else
+                value = this.gson.fromJson(adjustmentJson, Float.class);
+            this.adjustmentValues.put(entry.getKey(), value);
+        }
+        onAdjustmentsChangeAction();
+    }
+
+    public void setAdjustmentValue(MC4DConfig.Adjustments key, Float value) {
+        SharedPreferences.Editor prefsed = this.prefs.edit();
+        if(value == null) {
+            prefsed.remove(MC4DConfig.adjustmentsToAdjustmentPrefTag.get(key));
+            this.adjustmentValues.put(key, this.defaultAdjustmentValues.get(key));
+        }else{
+            prefsed.putString(
+                    MC4DConfig.adjustmentsToAdjustmentPrefTag.get(key),
+                    gson.toJson(value)
+            );
+            this.adjustmentValues.put(key, value);
+        }
+        prefsed.apply();
+        onAdjustmentsChangeAction();
+    }
+
+
 }

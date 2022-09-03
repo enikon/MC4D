@@ -1,14 +1,15 @@
 package com.cyanheron.magiccube4d.gui;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.support.v4.app.FragmentManager;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 public class Utils {
     public static String DIALOG_TAG = "dialog";
-    public static FragmentTransaction prepareDialog(Activity activity){
-        FragmentTransaction ft = activity.getFragmentManager().beginTransaction();
+
+    public static FragmentTransaction prepareDialog(AppCompatActivity activity) {
+        FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
 //        Fragment prev = activity.getFragmentManager().findFragmentByTag(DIALOG_TAG);
 //        if (prev != null) {
 //            ft.remove(prev);
@@ -16,4 +17,5 @@ public class Utils {
 //        ft.addToBackStack(null);
         return ft;
     }
+
 }

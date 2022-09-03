@@ -18,6 +18,7 @@ import android.graphics.Typeface;
 public class Graphics {
     private Canvas mCanvas;
     private Paint mPaint = new Paint();
+    private Paint lPaint = new Paint();
     private FontMetrics mFontMetrics = new FontMetrics();
 
     protected Canvas getCanvas() {
@@ -81,6 +82,9 @@ public class Graphics {
         mCanvas = canvas;
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setAntiAlias(true);
+
+        lPaint.setStyle(Paint.Style.STROKE);
+        lPaint.setAntiAlias(true);
     }
 
     public void setColor(Color color) {
@@ -113,7 +117,11 @@ public class Graphics {
     }
 
     public void drawPolygon(int[] xs, int[] ys, int length) {
-        System.out.println("Stub Graphics.drawPolygon");
+        mCanvas.drawPath(loadPath(xs, ys, length), lPaint);
+    }
+
+    public void drawPolygon(float[] xs, float[] ys, int length) {
+        mCanvas.drawPath(loadPath(xs, ys, length), lPaint);
     }
 
     public void fillRect(int x, int y, int w, int h) {

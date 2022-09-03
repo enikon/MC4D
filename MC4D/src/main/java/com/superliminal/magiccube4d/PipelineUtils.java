@@ -822,7 +822,8 @@ public class PipelineUtils
 
                 g.setColor(isShadows ? shadowcolor : stickercolor);
                 g.fillPolygon(xs, ys, poly.length);
-                if(!isShadows && outlineColor != null) {
+
+                if(outlineColor != null) {
                     g.setColor(outlineColor);
                     // uncomment the following line for an alternate outlining idea -MG
                     // g.setColor(new Color(faceRGB[cs][0], faceRGB[cs][1], faceRGB[cs][2]));

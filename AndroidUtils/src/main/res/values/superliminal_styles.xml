@@ -1,32 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-
     -->
+    <style name="ActivityTheme" parent="Theme.AppCompat.DayNight">
+        <item name="android:navigationBarColor">@color/ss_background</item>
+        <item name="actionBarPopupTheme">@style/SuperliminalTheme</item>
+    </style>
 
-    <style name="AppBaseTheme" parent="android:ThemeOverlay.Material.Dark">
+    <style name="AppBaseTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:tint">@color/ss_labels</item> <!-- Arrow Color -->
+        <item name="android:textColorSecondary">@color/ss_text</item>
+
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
-
         -->
-        <item name="android:windowNoTitle">false</item>
-        <item name="android:windowActionBar">true</item>
-        <item name="android:actionBarPopupTheme">@style/SubmenuHeaderStyle</item>
-    </style>
-
-    <style name="SubmenuHeaderStyle" parent="android:ThemeOverlay.Material.Dark.ActionBar">
-        <item name="android:tint">@color/ss_labels</item> <!-- Arrow Color -->
-        <item name="android:colorAccent">@color/ss_text</item>
+        <!--<item name="android:actionBarPopupTheme">@style/SubmenuHeaderStyle</item>-->
     </style>
 
     <!-- Override style.base text color with the Superliminal text color -->
     <style name="base">
-        <!-- <item name="android:textColor">@color/ss_text</item> -->
+        <item name="android:textColor">@color/ss_text</item>
     </style>
 
     <!-- Application theme. -->

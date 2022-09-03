@@ -1,7 +1,7 @@
 package com.cyanheron.magiccube4d.gui;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.Button;
@@ -72,6 +72,7 @@ public class ColorPickEntity extends LinearLayout {
                     ColorPickerDialog.DARK_THEME
                 );
             colorPickerDialog.setInitialColor(this.entityColor.intValue());
+            colorPickerDialog.setLastColor(this.entityColor.intValue());
             colorPickerDialog.setOnColorPickedListener((color, hexVal) -> {
                 listener.onColorChanged(new Color(color));
                 this.btn.setEnabled(true);
