@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    >
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch_controls_amt"
@@ -11,4 +13,25 @@
         android:layout_marginStart="5dp"
         android:minHeight="32dp"
         android:text="Advanced Multi-touch" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textSize="12sp"
+        android:layout_margin="4dp"
+        android:minLines="13"
+        android:text="
+        \n effects:
+        \n\t - pinching will no longer zoom
+        \n\t - face pieces can be twisted
+        \n\t   by:
+        \n\t\t * keeping 1st finger on the
+        \n\t\t   chosen face (forgiving margin)
+        \n\t\t * while swiping 2nd finger
+        \n\t\t   in chosen direction
+        \n\t\t   (like on a skateboard)
+        \n\t - centering on a face (27 cubes)
+        \n\t   is done now by double tapping" />
 </LinearLayout>

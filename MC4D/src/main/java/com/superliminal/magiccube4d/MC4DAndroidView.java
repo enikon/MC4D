@@ -193,7 +193,7 @@ public class MC4DAndroidView extends View {
                                         lastStart0, lastStart1, lastDrag1
                                     ) > 0 ? -1:1;
                                     lastDragSave = lastStart0;
-                                    thisView.twistSelected(direction, false);
+                                    thisView.twistSelected(direction, false, true);
                                     //Log.e("DEBUG", "TWIST");
                                 }
                             }
@@ -447,21 +447,22 @@ public class MC4DAndroidView extends View {
     }
 
     public void twistSelected(int dir){
-        twistSelected(dir, true);
+        twistSelected(dir, true, false);
     }
-    public void twistSelected(int dir, boolean planchette) {
+    public void twistSelected(int dir, boolean planchette, boolean useAdvancedControlHere) {
         // int stickerUnderPlanchette = PipelineUtils.pickSticker(
         // lastDragSave[0], lastDragSave[1] - PLANCHETTE_OFFSET_Y - PLANCHETTE_HEIGHT,
         // puzzleManager.untwistedFrame,
         // puzzleManager.puzzleDescription);
         //
 
-        puzzleManager.updateControlFrame();
+        if(useAdvancedControlHere)
+            puzzleManager.updateControlFrame();
 
         int grip = PipelineUtils.pickGrip(
                 // curPoint[0], curPoint[1]
                 lastDragSave[0], lastDragSave[1] - (planchette?(PLANCHETTE_OFFSET_Y + PLANCHETTE_HEIGHT):0),
-                puzzleManager.controlFrame,
+                !useAdvancedControlHere? puzzleManager.untwistedFrame : puzzleManager.controlFrame,
                 puzzleManager.puzzleDescription);
         // The twist might be illegal.
         if(grip < 0)

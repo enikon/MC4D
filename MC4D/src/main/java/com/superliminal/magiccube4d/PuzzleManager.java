@@ -256,11 +256,11 @@ public class PuzzleManager {
 //        public int shadowDrawListSize;
 //        public int drawList[][/*2*/];
 
-        controlFrame = this.updateControlFrame();
+        //controlFrame = this.updateControlFrame();
 
         PipelineUtils.PickInfo pick = PipelineUtils.getAllPickInfo(
                 mouseX, mouseY,
-                controlFrame, // TODO change frame vert sizes
+                untwistedFrame, // TODO change frame vert sizes
                 puzzleDescription);
         int pickedSticker = pick == null ? -1 : pick.stickerIndex;
         boolean newHighlit = true;
