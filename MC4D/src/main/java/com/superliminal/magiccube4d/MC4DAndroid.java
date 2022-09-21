@@ -21,6 +21,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.DialogFragment;
 
 import com.cyanheron.magiccube4d.gui.ColorPickTableDialogFragment;
+import com.cyanheron.magiccube4d.gui.ControlsDialogFragment;
 import com.cyanheron.magiccube4d.gui.MC4DConfig;
 import com.cyanheron.magiccube4d.gui.MC4DPreferencesManager;
 import com.cyanheron.magiccube4d.gui.Utils;
@@ -126,6 +127,9 @@ public class MC4DAndroid extends AppCompatActivity {
                         MagicCube.STICKERSHRINK,
                         MagicCube.EYEW
                 },
+                new String[]{
+                        false+""
+                },
                 (colors, colors2) -> {
                     mPuzzleManager.faceColors = colors;
                     mPuzzleManager.bgColor = colors2[MC4DConfig.Names.BACKGROUND.ordinal()];
@@ -143,6 +147,10 @@ public class MC4DAndroid extends AppCompatActivity {
                         );
                     }
                     view.invalidate();
+                },
+                controls -> {
+                    mPuzzleManager.useAdvancedControl = controls;
+                    view.useAdvancedControl = controls;
                 }
         ); // ColorUtils.generateVisuallyDistinctColors(puzzleDescription.nFaces(), .7f, .1f);
 
@@ -268,6 +276,11 @@ public class MC4DAndroid extends AppCompatActivity {
                 FragmentTransaction ft = Utils.prepareDialog(this);
                 DialogFragment cptdf = ColorPickTableDialogFragment.newInstance(this.mPreferencesManager);
                 cptdf.show(ft, Utils.DIALOG_TAG);
+                break;
+            case R.id.controls:
+                FragmentTransaction ft5 = Utils.prepareDialog(this);
+                DialogFragment ctrldf = ControlsDialogFragment.newInstance(this.mPreferencesManager);
+                ctrldf.show(ft5, Utils.DIALOG_TAG);
                 break;
             case R.id.adjustments:
                 FragmentTransaction ft4 = Utils.prepareDialog(this);

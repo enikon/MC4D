@@ -10,6 +10,7 @@ import com.superliminal.util.android.Color;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MC4DPreferencesManager {
 
@@ -23,19 +24,25 @@ public class MC4DPreferencesManager {
     public LinkedHashMap<MC4DConfig.Names, Color> nameColor;
     public LinkedHashMap<MC4DConfig.Names, Color> defaultNameColor;
 
+    public LinkedHashMap<MC4DConfig.Controls, String> defaultControlsSettings;
+    public LinkedHashMap<MC4DConfig.Controls, String> controlsSettings;
+
     public LinkedHashMap<MC4DConfig.Adjustments, Float> adjustmentValues;
     public LinkedHashMap<MC4DConfig.Adjustments, Float> defaultAdjustmentValues;
 
     private OnColorsChange onColorsChange;
     private OnAdjustmentsChange onAdjustmentsChange;
+    private OnControlChange onControlChange;
 
     public MC4DPreferencesManager(
             Context context,
             Color[] defaultColors,
             Color[] defaultNameColors,
             Float[] defaultAdjustmentValues,
+            String[] defaultControlsSettings,
             OnColorsChange onColorsChange,
-            OnAdjustmentsChange onAdjustmentsChange
+            OnAdjustmentsChange onAdjustmentsChange,
+            OnControlChange onControlChange
 
     ){
         this.context = context;
@@ -43,6 +50,7 @@ public class MC4DPreferencesManager {
         this.colors = Arrays.<Color>copyOf(this.defaultColors, this.defaultColors.length);
         this.onColorsChange = onColorsChange;
         this.onAdjustmentsChange = onAdjustmentsChange;
+        this.onControlChange = onControlChange;
         this.gson = new Gson();
         this.prefs = this.context.getSharedPreferences("mc4d", 0);
 
@@ -52,6 +60,13 @@ public class MC4DPreferencesManager {
             this.defaultNameColor.put(n, defaultNameColors[n.ordinal()]);
         }
         this.reloadColors();
+
+        this.controlsSettings = new LinkedHashMap<>();
+        this.defaultControlsSettings = new LinkedHashMap<>();
+        for(MC4DConfig.Controls n : MC4DConfig.Controls.values()){
+            this.defaultControlsSettings.put(n, defaultControlsSettings[n.ordinal()]);
+        }
+        this.reloadControls();
 
         this.adjustmentValues = new LinkedHashMap<>();
         this.defaultAdjustmentValues = new LinkedHashMap<>();
@@ -176,5 +191,40 @@ public class MC4DPreferencesManager {
         onAdjustmentsChangeAction();
     }
 
+
+    public void setControls(MC4DConfig.Controls key, String value) {
+        SharedPreferences.Editor prefsed = this.prefs.edit();
+        if(value == null) {
+            prefsed.remove(MC4DConfig.controlsToControlsPrefTag.get(key));
+            this.controlsSettings.put(key, this.defaultControlsSettings.get(key));
+        }else{
+            prefsed.putString(
+                    MC4DConfig.controlsToControlsPrefTag.get(key),
+                    value
+            );
+            this.controlsSettings.put(key, value);
+        }
+        prefsed.apply();
+        this.onControlChange.onControlChange(Boolean.parseBoolean(this.controlsSettings.get(MC4DConfig.Controls.AMT)));
+
+    }
+
+    public String getControls(MC4DConfig.Controls key){
+        return this.controlsSettings.get(key);
+    }
+    public void reloadControls() {
+        for (Map.Entry<MC4DConfig.Controls, String> entry : MC4DConfig.controlsToControlsPrefTag.entrySet()) {
+            String controlSetting = this.prefs.getString(
+                    MC4DConfig.controlsToControlsPrefTag.get(entry.getKey()),
+                    null);
+            String value;
+            if (controlSetting == null)
+                value = this.defaultControlsSettings.get(entry.getKey());
+            else
+                value = controlSetting;
+            this.controlsSettings.put(entry.getKey(), value);
+        }
+        this.onControlChange.onControlChange(Boolean.parseBoolean(this.controlsSettings.get(MC4DConfig.Controls.AMT)));
+    }
 
 }

@@ -12,6 +12,10 @@ public class MC4DConfig {
         BACKGROUND, ACTIVE
     }
 
+    public static enum Controls{
+        AMT
+    }
+
     public static enum Adjustments{
         VIEW_SCALE, FACE_SHRINK, STICKER_SHRINK, EYE_W_SCALE
     }
@@ -19,14 +23,14 @@ public class MC4DConfig {
     public static Map<FaceNames, Integer> faceToColorArrayIndex;
     static {
         faceToColorArrayIndex = new LinkedHashMap<>();
-        faceToColorArrayIndex.put(FaceNames.FRONT, 2);
-        faceToColorArrayIndex.put(FaceNames.BACK, 5);
+        faceToColorArrayIndex.put(FaceNames.FRONT, 6);
+        faceToColorArrayIndex.put(FaceNames.BACK, 1);
         faceToColorArrayIndex.put(FaceNames.TOP, 0);
         faceToColorArrayIndex.put(FaceNames.BOTTOM, 7);
-        faceToColorArrayIndex.put(FaceNames.LEFT, 3);
-        faceToColorArrayIndex.put(FaceNames.RIGHT, 4);
-        faceToColorArrayIndex.put(FaceNames.UPPER, 6);
-        faceToColorArrayIndex.put(FaceNames.LOWER, 1);
+        faceToColorArrayIndex.put(FaceNames.LEFT, 5);
+        faceToColorArrayIndex.put(FaceNames.RIGHT, 2);
+        faceToColorArrayIndex.put(FaceNames.UPPER, 4);
+        faceToColorArrayIndex.put(FaceNames.LOWER, 3);
     }
 
     public static class ColorsStruct{
@@ -107,6 +111,12 @@ public class MC4DConfig {
         adjustmentToAdjustmentTabs.put(Adjustments.FACE_SHRINK, new AdjustmentStruct(0.25f, 1.0f, "Scale in 4D (W-axis) \n (Face scale)", "4DSc", "faceshrink"));
         adjustmentToAdjustmentTabs.put(Adjustments.STICKER_SHRINK, new AdjustmentStruct(0f, 1f, "Scale in 3D (XYZ-axis) \n (Stickers scale)", "3DSc", "stickershrink"));
         adjustmentToAdjustmentTabs.put(Adjustments.EYE_W_SCALE, new AdjustmentStruct(0.625f, 1.5f, "Field of view in 4D (W-axis) \n (Side faces distortion)", "4DFov", "eyew"));
+    }
+
+    public static Map<Controls, String>  controlsToControlsPrefTag;
+    static {
+        controlsToControlsPrefTag = new LinkedHashMap<>();
+        controlsToControlsPrefTag.put(Controls.AMT, "advanced_control_settings");
     }
 
     //faceshrink stickershrink scale eyew

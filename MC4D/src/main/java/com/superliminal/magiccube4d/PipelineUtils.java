@@ -20,9 +20,13 @@ package com.superliminal.magiccube4d;
 *    pick       - picks what is at a given point in the Frame
 */
 
+import com.cyanheron.magiccube4d.gui.Utils;
 import com.donhatchsw.util.VecMath;
 import com.superliminal.util.android.Color;
 import com.superliminal.util.android.Graphics;
+
+import java.util.Comparator;
+import java.util.stream.IntStream;
 
 public class PipelineUtils
 {
@@ -515,7 +519,7 @@ public class PipelineUtils
             int poly[] = stickerInds[iSticker][iPolyWithinSticker];
             int j;
             for (j = 0; j < poly.length; ++j)
-                if (twice_triangle_area(verts[poly[j]], verts[poly[(j+1)%poly.length]], thispoint) > 0)
+                if (twice_triangle_area(verts[poly[j]], verts[poly[(j+1)%poly.length]], thispoint) >= 0)
                     break; // it's CW  (>0 means CW since inverted)
             if (j == poly.length) // they were all CCW, so we hit this poly
             {
@@ -760,13 +764,14 @@ public class PipelineUtils
         int xs[] = new int[0], // XXX ALLOCATION
             ys[] = new int[0]; // XXX ALLOCATION
         Color shadowcolor = ground == null ? Color.black : ground.darker().darker().darker().darker();
+
+        ///////////////// TODO EFIT
+
         for (int iPass = 0; iPass < 2; ++iPass)
         {
             boolean isShadows = iPass == 0;
             float verts[][] = isShadows ? frame.shadowVerts : frame.verts;
             int drawListSize = isShadows ? frame.shadowDrawListSize : frame.drawListSize;
-            //System.out.println("isShadows="+isShadows);
-            //System.out.println("drawListSize="+drawListSize);
             for (int iItem = 0; iItem < drawListSize; ++iItem)
             {
             	if(drawList == null || iItem >= drawList.length || drawList[iItem].length < 1)
@@ -843,6 +848,117 @@ public class PipelineUtils
         Vec_h._VMV2(tmpTWAf1, v1, v0);
         Vec_h._VMV2(tmpTWAf2, v2, v0);
         return Vec_h._VXV2(tmpTWAf1, tmpTWAf2);
+    }
+
+
+    public static int[] generateControlFrameMapping(
+            PuzzleDescription puzzleDescription,
+            AnimFrame frame
+    ){
+        int[] res = new int[frame.verts.length];
+
+        float[][] vs = puzzleDescription.getStandardStickerVertsAtRest();
+        int stickerInds[][][] = puzzleDescription.getStickerInds(); // [nStickers][nPolygonsThisSticker][]
+        int sticker2cubie[] = puzzleDescription.getSticker2Cubie();
+        int sticker2Face[] = puzzleDescription.getSticker2Face();
+
+        int nStickers = sticker2Face.length;
+        int[] cubie_order = new int[nStickers];
+        int[] vs_order = new int[nStickers];
+
+        for (int i = 0; i < nStickers; i++) { // Generate cubie order
+            cubie_order[sticker2cubie[i]] += 1;
+        }
+        for (int i = 0; i < nStickers; i++) { // Get sticker order from cubie order
+            vs_order[i] = cubie_order[sticker2cubie[i]];
+        }
+
+        float[] stickerCentre = new float[4];
+        float[] baseStickerCentre = new float[4];
+        float[] displacement = new float[4], displacement2 = new float[4];
+        /*
+        Sticker centre for hypercorner (order 4) (+-1, +-2/3, -2/3, -2/3), W=64
+        Sticker centre for corner (order 3) (+-1, +-2/3, -2/3, 0), W=96
+        Sticker centre for edge (order 2) (+-1, +-2/3, 0, 0), W=48
+        Sticker centre for face (order 1) (+-1, 0, 0, 0), W=8
+        */
+
+        int[] vsmap = new int[4096];
+        for (int i = 0; i < 4096; i++) {
+            vsmap[i] = -1;
+        }
+        int y;
+        for (int i = 0; i < nStickers; i++) { //
+            if (vs_order[i] == 2) {
+                Utils.getStickerCenter(stickerCentre, vs, stickerInds[i]);
+                y = Utils.centerToIndex(stickerCentre);
+                vsmap[y] = i;
+            }
+        }
+
+        int __mask23 = 0b001, mask23 = 0;
+        for (int i = 0; i < 4; i++) {
+            mask23 += __mask23 << (3 * i);
+        }
+
+        for (int i = 0; i < nStickers; i++) {
+            if (vs_order[i] == 4) {
+                Utils.getStickerCenter(stickerCentre, vs, stickerInds[i]);
+                y = Utils.centerToIndex(stickerCentre);
+
+                int ym = y & mask23;
+                int only1 = y & (4095 - (ym + (ym << 1) + (ym << 2)));
+                for (int j = 0; j < 4; j++) {
+                    int i_x = (y & (7 << (3 * j))) + (only1 & (4095 - (7 << (3 * j))));
+                    int x = vsmap[i_x];
+                    int farI = -1, nearI = -1, farX = -1, nearX = -1;
+
+                    if (x != -1) {
+                        Utils.getStickerCenter(baseStickerCentre, vs, stickerInds[x]);
+                        Utils._VMV4(displacement, stickerCentre, baseStickerCentre);
+
+                        for (int l = 0; l < 8; l++) {
+                            if (Utils.neq_abs(Utils._PROD4(vs[i * 8 + l]), 1f) == 0)
+                                farI = i * 8 + l;
+                            if (Utils.neq_abs(Utils._PROD4(vs[i * 8 + l]), (float) Math.pow(1f / 3f, 3)) == 0)
+                                nearI = i * 8 + l;
+
+                            Utils._VMV4(displacement2, vs[x * 8 + l], baseStickerCentre);
+                            Utils._VXV4(displacement2, displacement2, displacement);
+                            Utils._SIGN4(displacement2, displacement2);
+                            boolean neg = false;
+                            for (float v : displacement2) {
+                                if (v == -1f) {
+                                    neg = true;
+                                    break;
+                                }
+                            }
+                            if (!neg) {
+                                if (Utils.neq_abs(Utils._PROD4(vs[x * 8 + l]), (float) Math.pow(1f / 3f, 2)) == 0)
+                                    farX = x * 8 + l;
+                                if (Utils.neq_abs(Utils._PROD4(vs[x * 8 + l]), (float) Math.pow(1f / 3f, 3)) == 0)
+                                    nearX = x * 8 + l;
+                            }
+                        }
+                        res[farX] = farI+1;
+                        res[nearX] = nearI+1;
+//                        for (int l = 0; l < 4; l++) {
+//                            frame.verts[farX][l] = frame.verts[farI][l];
+//                            frame.verts[nearX][l] = frame.verts[nearI][l];
+//                        }
+                    }
+                }
+            }
+//            if (vs_order[i] != 2) {
+//                Utils.getStickerCenter(stickerCentre, vs, stickerInds[i]);
+//                for (int j = 0; j < 6; j++) {
+//                    for (int k = 0; k < 4; k++) {
+//                        System.arraycopy(stickerCentre, 0, frame.verts[stickerInds[i][j][k]], 0, 4);
+//                    }
+//                }
+//            }
+        }
+        return res;
     }
 
 } // class PipelineUtils

@@ -7,6 +7,8 @@ import java.util.Set;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.cyanheron.magiccube4d.gui.MC4DPreferencesManager;
+import com.cyanheron.magiccube4d.gui.Utils;
 import com.donhatchsw.util.VecMath;
 import com.superliminal.util.android.Color;
 import com.superliminal.util.android.ColorUtils;
@@ -70,6 +72,10 @@ public class PuzzleManager {
     // Two scratch Frames to use for computing and painting.
     //
     PipelineUtils.AnimFrame untwistedFrame = new PipelineUtils.AnimFrame();
+    PipelineUtils.AnimFrame controlFrame = new PipelineUtils.AnimFrame();
+    int[] frameVertsMapping = null;
+    public boolean useAdvancedControl = false;
+
     private PipelineUtils.AnimFrame twistingFrame = new PipelineUtils.AnimFrame();
     {
         twistingFrame = untwistedFrame;
@@ -244,9 +250,17 @@ public class PuzzleManager {
     private Highlighter highlighter;
 
     public boolean updateStickerHighlighting(int mouseX, int mouseY, int slicemask, boolean isControlDown) {
+
+//        public float verts[][/*4*/]; // x,y,z,w, not just x,y! see above
+//        public int drawListSize;
+//        public int shadowDrawListSize;
+//        public int drawList[][/*2*/];
+
+        controlFrame = this.updateControlFrame();
+
         PipelineUtils.PickInfo pick = PipelineUtils.getAllPickInfo(
                 mouseX, mouseY,
-                untwistedFrame,
+                controlFrame, // TODO change frame vert sizes
                 puzzleDescription);
         int pickedSticker = pick == null ? -1 : pick.stickerIndex;
         boolean newHighlit = true;
@@ -623,4 +637,36 @@ public class PuzzleManager {
         System.out.println("Total seconds: " + (System.currentTimeMillis() - start) / 1000);
     }
 
+    public PipelineUtils.AnimFrame updateControlFrame() {
+
+        if(controlFrame == null) controlFrame = new PipelineUtils.AnimFrame();
+
+        if(controlFrame.verts == null) controlFrame.verts = new float[untwistedFrame.verts.length][untwistedFrame.verts[0].length];
+        Utils.arrayCopy(untwistedFrame.verts, controlFrame.verts);
+
+        if(controlFrame.drawList == null) controlFrame.drawList = new int[untwistedFrame.drawList.length][untwistedFrame.drawList[0].length];
+        Utils.arrayCopy(untwistedFrame.drawList, controlFrame.drawList);
+        controlFrame.drawListSize = untwistedFrame.drawListSize;
+
+        if(useAdvancedControl) {
+            if (frameVertsMapping == null) {
+                frameVertsMapping = PipelineUtils.generateControlFrameMapping(
+                        puzzleDescription,
+                        controlFrame
+                );
+            }
+            int x;
+            for (int i = 0; i < frameVertsMapping.length; i++) {
+                x = frameVertsMapping[i];
+                if (x != 0)
+                    System.arraycopy(controlFrame.verts[x - 1], 0, controlFrame.verts[i], 0, 4);
+            }
+            for (int i = 0; i < frameVertsMapping.length; i++) {
+                x = frameVertsMapping[i];
+                if (x == 0) for (int l = 0; l < 4; l++)
+                    controlFrame.verts[i][l] = 0f;
+            }
+        }
+        return controlFrame;
+    }
 } // class PuzzleManager
