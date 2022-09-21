@@ -70,6 +70,7 @@ public class MC4DAndroidView extends View {
         });
 
         animationQueue = new AnimationQueue(hist);
+        final MC4DAndroidView thisView = this;
         this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -101,6 +102,7 @@ public class MC4DAndroidView extends View {
                         else {
                             lastDrag1 = lastStart1 = pos1;
                             lastDown1 = now;
+                            //Log.d("DEBUG", "ls1 "+lastStart1[0]+" "+lastStart1[1]);
                         }
                         if(!useAdvancedControl) {
                             float[] diff = new float[2];
@@ -177,15 +179,39 @@ public class MC4DAndroidView extends View {
                             lastDrag1 = null;
                         break;
                     case MotionEvent.ACTION_POINTER_UP: // This is *not* the last pointer up.
-                        if(pid == 0)
+                        if(useAdvancedControl){
+                            if(pid == 1 && lastDrag0!=null && lastDrag1!=null && now - lastDown1 < 1500){
+
+                                float[] drag_dir = new float[2];
+                                Vec_h._VMV2(drag_dir, lastDrag0, lastStart0);
+                                double dist0 = Math.sqrt(Vec_h._NORMSQRD2(drag_dir));
+
+                                Vec_h._VMV2(drag_dir, lastDrag1, lastStart1);
+                                double dist1 = Math.sqrt(Vec_h._NORMSQRD2(drag_dir));
+                                if(dist0 < 30 && dist1 > 50){
+                                    int direction = PipelineUtils.twice_triangle_area(
+                                        lastStart0, lastStart1, lastDrag1
+                                    ) > 0 ? -1:1;
+                                    lastDragSave = lastStart0;
+                                    thisView.twistSelected(direction, false);
+                                    //Log.e("DEBUG", "TWIST");
+                                }
+                            }
                             lastDrag0 = null;
-                        else
+                        }
+                        if(pid == 0) {
+                            lastStart0 = null;
+                            lastDrag0 = null;
+                        }
+                        else {
+                            lastStart1 = null;
                             lastDrag1 = null;
+                        }
                         break;
                     case MotionEvent.ACTION_MOVE:
                         mY = (int) event.getY();
                         float[] end0 = new float[]{event.getX(0), event.getY(0)};
-                        if(event.getPointerCount() == 1) { // Only rotate while a single finger is down.
+                        if(event.getPointerCount() == 1 && event.getPointerId(0) == 0) { // Only rotate while a single finger is down.
                             float[]
                                     drag_dir = new float[2],
                                     last_pos = event.getPointerId(0) == 0 ? lastDrag0 : lastDrag1;
@@ -201,10 +227,13 @@ public class MC4DAndroidView extends View {
                             if(inputMode == InputMode.ROT_3D || inputMode == InputMode.ROT_4D)
                                 rotationHandler.mouseDragged(drag_dir[0], drag_dir[1], true, false, inputMode == InputMode.ROT_4D);
                         }
+
                         if(event.getPointerId(0) == 0) // Update the first pointer position. (There's always at least one.)
                             lastDragSave = lastDrag0 = end0;
-                        else { // pointer ID at 0 must be 1 (or greater?)
-                            lastDrag1 = end0;
+
+                        if(event.getPointerCount() == 2 && event.getPointerId(1) == 1){ // pointer ID at 0 must be 1 (or greater?)
+                            lastDrag1 = new float[]{event.getX(1), event.getY(1)};
+                            //Log.d("DEBUG", "ldg1 "+lastDrag1[0]+" "+lastDrag1[1]);
                         }
                         if(!useAdvancedControl) {
                             if (event.getPointerCount() > 1) { // There's more than one (maybe assert count == 2?). Update that too.
@@ -318,7 +347,7 @@ public class MC4DAndroidView extends View {
                     rotationHandler,
                     PropertyManager.getFloat("eyew", MagicCube.EYEW),
                     MagicCube.EYEZ * PropertyManager.getFloat("scale", 1),
-                    polys2pixelsSF * (float) pinchSF,
+                    polys2pixelsSF * (float)(useAdvancedControl? 1 : pinchSF),
                     xOff,
                     yOff,
                     MagicCube.SUNVEC,
@@ -417,7 +446,10 @@ public class MC4DAndroidView extends View {
         invalidate();
     }
 
-    public void twistSelected(int dir) {
+    public void twistSelected(int dir){
+        twistSelected(dir, true);
+    }
+    public void twistSelected(int dir, boolean planchette) {
         // int stickerUnderPlanchette = PipelineUtils.pickSticker(
         // lastDragSave[0], lastDragSave[1] - PLANCHETTE_OFFSET_Y - PLANCHETTE_HEIGHT,
         // puzzleManager.untwistedFrame,
@@ -428,7 +460,7 @@ public class MC4DAndroidView extends View {
 
         int grip = PipelineUtils.pickGrip(
                 // curPoint[0], curPoint[1]
-                lastDragSave[0], lastDragSave[1] - PLANCHETTE_OFFSET_Y - PLANCHETTE_HEIGHT,
+                lastDragSave[0], lastDragSave[1] - (planchette?(PLANCHETTE_OFFSET_Y + PLANCHETTE_HEIGHT):0),
                 puzzleManager.controlFrame,
                 puzzleManager.puzzleDescription);
         // The twist might be illegal.

@@ -842,7 +842,7 @@ public class PipelineUtils
 
 
     private static float tmpTWAf1[] = new float[2], tmpTWAf2[] = new float[2]; // scratch vars
-    private static float twice_triangle_area(float v0[], float v1[], float v2[])
+    public static float twice_triangle_area(float v0[], float v1[], float v2[])
     {
         //float tmpTNf1[] = new float[2], tmpTNf2[] = new float[2];
         Vec_h._VMV2(tmpTWAf1, v1, v0);
