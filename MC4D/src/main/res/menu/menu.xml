@@ -35,11 +35,11 @@
     </item>
     <item android:title="Solve" android:id="@+id/solve">
         <menu>
-            <item android:title="Reset View" android:id="@+id/solve_reset_view"></item>
             <item android:title="Solve - Reset" android:id="@+id/solve_reset"></item>
             <item android:title="Solve - Step by Step" android:id="@+id/solve_step"></item>
         </menu>
     </item>
+    <item android:title="Reset View" android:id="@+id/solve_reset_view"></item>
     <item android:title="About" android:id="@+id/about">
         <menu>
             <item android:title="About..." android:id="@+id/about_orig" android:icon="@android:drawable/ic_menu_info_details"></item>

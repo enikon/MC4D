@@ -151,6 +151,7 @@ public class MC4DAndroid extends AppCompatActivity {
                 controls -> {
                     mPuzzleManager.useAdvancedControl = controls;
                     view.useAdvancedControl = controls;
+                    view.invalidate();
                 }
         ); // ColorUtils.generateVisuallyDistinctColors(puzzleDescription.nFaces(), .7f, .1f);
 
@@ -286,6 +287,10 @@ public class MC4DAndroid extends AppCompatActivity {
                 FragmentTransaction ft4 = Utils.prepareDialog(this);
                 DialogFragment adf = TabbedDialogFragment.newInstance(this.mPreferencesManager);
                 adf.show(ft4, Utils.DIALOG_TAG);
+                break;
+            case R.id.solve_reset_view:
+                view.rotationHandler = new RotationHandler(MagicCube.NICE_VIEW);
+                view.invalidate();
                 break;
             case R.id.send_log:
                 sendLog(new File(getFilesDir(), MagicCube.LOG_FILE));

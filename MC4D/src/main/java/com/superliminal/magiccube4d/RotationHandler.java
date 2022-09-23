@@ -54,6 +54,7 @@ public class RotationHandler
 	private double spinDelta[][];
 	private double viewMat4d[][] = VecMath.identitymat( 4 );
 
+	public void resetCurrent4dView() { viewMat4d = VecMath.identitymat( 4 );}
 	public double[][] current4dView()
 	{
 		return viewMat4d;

@@ -35,7 +35,7 @@ public class MC4DAndroidView extends View {
     private int stickerUnderPlanchette = -1;
 
     private PuzzleManager puzzleManager;
-    private RotationHandler rotationHandler = new RotationHandler(MagicCube.NICE_VIEW);
+    public RotationHandler rotationHandler = new RotationHandler(MagicCube.NICE_VIEW);
     public RotationHandler getRotations() { return rotationHandler; }
     private float[] lastDrag0, lastDrag1; // Most recent position of fingers. Non-null == dragging.
     private float[] lastDragSave = new float[2]; // never null

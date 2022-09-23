@@ -23,14 +23,14 @@ public class MC4DConfig {
     public static Map<FaceNames, Integer> faceToColorArrayIndex;
     static {
         faceToColorArrayIndex = new LinkedHashMap<>();
-        faceToColorArrayIndex.put(FaceNames.FRONT, 6);
-        faceToColorArrayIndex.put(FaceNames.BACK, 1);
+        faceToColorArrayIndex.put(FaceNames.FRONT, 2);
+        faceToColorArrayIndex.put(FaceNames.BACK, 5);
         faceToColorArrayIndex.put(FaceNames.TOP, 0);
         faceToColorArrayIndex.put(FaceNames.BOTTOM, 7);
-        faceToColorArrayIndex.put(FaceNames.LEFT, 5);
-        faceToColorArrayIndex.put(FaceNames.RIGHT, 2);
-        faceToColorArrayIndex.put(FaceNames.UPPER, 4);
-        faceToColorArrayIndex.put(FaceNames.LOWER, 3);
+        faceToColorArrayIndex.put(FaceNames.LEFT, 3);
+        faceToColorArrayIndex.put(FaceNames.RIGHT, 4);
+        faceToColorArrayIndex.put(FaceNames.UPPER, 6);
+        faceToColorArrayIndex.put(FaceNames.LOWER, 1);
     }
 
     public static class ColorsStruct{
