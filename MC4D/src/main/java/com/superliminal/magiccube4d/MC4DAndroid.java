@@ -4,6 +4,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,12 +25,16 @@ import com.cyanheron.magiccube4d.gui.ColorPickTableDialogFragment;
 import com.cyanheron.magiccube4d.gui.ControlsDialogFragment;
 import com.cyanheron.magiccube4d.gui.MC4DConfig;
 import com.cyanheron.magiccube4d.gui.MC4DPreferencesManager;
+import com.cyanheron.magiccube4d.gui.MenuItemHandler;
+import com.cyanheron.magiccube4d.gui.SaveManager;
+import com.cyanheron.magiccube4d.gui.StringMapper;
 import com.cyanheron.magiccube4d.gui.Utils;
 import com.kunmii.custom_dialog_with_tabs.TabbedDialogFragment;
 import com.superliminal.magiccube4d.MagicCube.InputMode;
 import com.superliminal.util.PropertyManager;
 import com.superliminal.util.android.Color;
 import com.superliminal.util.android.DialogUtils;
+import com.superliminal.util.android.EmailUtils;
 import com.superliminal.util.android.Graphics;
 
 import java.io.BufferedReader;
@@ -40,11 +45,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class MC4DAndroid extends AppCompatActivity {
     private static final int EDGE_LENGTH = 3;
@@ -53,6 +60,10 @@ public class MC4DAndroid extends AppCompatActivity {
     private History mHist = new History(EDGE_LENGTH);
     private MC4DAndroidView view;
     private MediaPlayer mCorrectSound, mWipeSound, mWrongSound, mFanfareSound;
+    private SaveManager mSaveManager;
+    private MenuItemHandler[] mMenuItemManagerSave;
+    private MenuItemHandler[] mMenuItemManagerLoad;
+
     private enum ScrambleState { NONE, FEW, FULL }
     private ScrambleState mScrambleState = ScrambleState.NONE;
     private boolean mIsScrambling = false;
@@ -107,8 +118,9 @@ public class MC4DAndroid extends AppCompatActivity {
         //setContentView(R.layout.main); // For debugging only.
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);
         mPuzzleManager = new PuzzleManager(MagicCube.DEFAULT_PUZZLE, /* MagicCube.DEFAULT_LENGTH */EDGE_LENGTH, new ProgressView());
-        File log_file = new File(getFilesDir(), MagicCube.LOG_FILE);
         view = new MC4DAndroidView(getApplicationContext(), mPuzzleManager, mHist);
+
+        mSaveManager = new SaveManager(this);
 
         //addContentView(view, params);
         ViewGroup holder = (ViewGroup) findViewById(R.id.puzzle_holder);
@@ -155,7 +167,7 @@ public class MC4DAndroid extends AppCompatActivity {
                 }
         ); // ColorUtils.generateVisuallyDistinctColors(puzzleDescription.nFaces(), .7f, .1f);
 
-        boolean readOK = readLog(log_file);
+        boolean readOK = readLog(mSaveManager.getCurrentFile(true));
         initMode(R.id.D3, InputMode.ROT_3D);
         initMode(R.id.D4, InputMode.ROT_4D);
         initMode(R.id.twisting, InputMode.TWISTING);
@@ -182,10 +194,14 @@ public class MC4DAndroid extends AppCompatActivity {
             private boolean adjusting = false;
             @Override
             public void currentChanged() {
-                if(adjusting)
+                if(adjusting || mSaveManager.lock)
                     return; // Ignore messages from self.
                 adjusting = true;
-                writeLog(new File(getFilesDir(), MagicCube.LOG_FILE));
+
+                writeLog(mSaveManager.getCurrentFile(true));
+                mMenuItemManagerSave[mSaveManager.getSlot()].update();
+                mMenuItemManagerLoad[mSaveManager.getSlot()].update();
+
                 if(mPuzzleManager.isSolved()) {
                     if(!(mScrambleState == ScrambleState.NONE || mIsScrambling))
                         if(mScrambleState == ScrambleState.FULL)
@@ -227,6 +243,27 @@ public class MC4DAndroid extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+
+        mMenuItemManagerSave = new MenuItemHandler[]{
+                new MenuItemHandler(menu.findItem(R.id.save_manual), () -> "Slot "+mSaveManager.getSlot()+" "+mSaveManager.getCurrentInfo(false)),
+                new MenuItemHandler(menu.findItem(R.id.save_slot_1), () -> " "+mSaveManager.getInfo(1, true)),
+                new MenuItemHandler(menu.findItem(R.id.save_slot_2), () -> " "+mSaveManager.getInfo(2, true)),
+                new MenuItemHandler(menu.findItem(R.id.save_slot_3), () -> " "+mSaveManager.getInfo(3, true))
+        };
+
+        mMenuItemManagerLoad = new MenuItemHandler[]{
+                new MenuItemHandler(menu.findItem(R.id.load_manual), () -> "Slot "+mSaveManager.getSlot()+" "+mSaveManager.getCurrentInfo(false)),
+                new MenuItemHandler(menu.findItem(R.id.load_slot_1), () -> " "+mSaveManager.getInfo(1, true)),
+                new MenuItemHandler(menu.findItem(R.id.load_slot_2), () -> " "+mSaveManager.getInfo(2, true)),
+                new MenuItemHandler(menu.findItem(R.id.load_slot_3), () -> " "+mSaveManager.getInfo(3, true))
+        };
+        for(MenuItemHandler mih: mMenuItemManagerSave){
+            mih.update();
+        }
+        for(MenuItemHandler mih: mMenuItemManagerLoad){
+            mih.update();
+        }
+
         return true;
     }
 
@@ -237,15 +274,18 @@ public class MC4DAndroid extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        int itemId = item.getItemId();
+        int slot;
+        String appNameStr, html;
+        switch(itemId) {
             case R.id.about_orig:
-                String appNameStr = getString(R.string.app_name) + " ";
+                appNameStr = getString(R.string.app_name) + " ";
                 try {
                     appNameStr += "v" + getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName + " ";
                 } catch(NameNotFoundException e) {
                     e.printStackTrace();
                 }
-                String html =
+                html =
                     "<b><big>" + appNameStr + "</big><br>Copyright 2010 by Melinda Green <br>Superliminal Software</b><br>" +
                         "<hr width=\"100%\" align=\"center\" size=\"1\"> <br>" +
                         "This version of Magic Cube 4D is a mobile version of the full-featured desktop application " +
@@ -292,14 +332,73 @@ public class MC4DAndroid extends AppCompatActivity {
                 view.rotationHandler = new RotationHandler(MagicCube.NICE_VIEW);
                 view.invalidate();
                 break;
+            case R.id.save_manual:
+                writeLog(mSaveManager.getCurrentFile(false));
+
+                mMenuItemManagerSave[0].update();
+                mMenuItemManagerLoad[0].update();
+
+                break;
+            case R.id.save_slot_1 : case R.id.save_slot_2 : case R.id.save_slot_3 :
+                slot = 1 + Arrays.stream(new int[]{R.id.save_slot_1, R.id.save_slot_2, R.id.save_slot_3})
+                        .boxed().collect(Collectors.toList()).indexOf(itemId);
+
+                writeLog(mSaveManager.getFile(slot, true));
+                updateMenuItemHandlers(slot);
+
+                break;
+            case R.id.load_manual:
+                mSaveManager.lock = true;
+                readLog(mSaveManager.getCurrentFile(false));
+                mSaveManager.lock = false;
+                break;
+            case R.id.load_slot_1 :  case R.id.load_slot_2 :  case R.id.load_slot_3 :
+                slot = 1 + Arrays.stream(new int[]{R.id.load_slot_1, R.id.load_slot_2, R.id.load_slot_3})
+                        .boxed().collect(Collectors.toList()).indexOf(itemId);
+                mSaveManager.setSlot(slot);
+                mSaveManager.lock = true;
+                readLog(mSaveManager.getCurrentFile(true));
+                mSaveManager.lock = false;
+
+                mMenuItemManagerSave[0].update();
+                mMenuItemManagerLoad[0].update();
+
+                break;
             case R.id.send_log:
-                sendLog(new File(getFilesDir(), MagicCube.LOG_FILE));
+                sendLog(mSaveManager.getCurrentFile(true));
+                break;
+            case R.id.about_mod:
+                appNameStr = getString(R.string.app_name) + " ";
+                try {
+                    appNameStr += "v" + getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName + " ";
+                } catch(NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                html =
+                    "<b><big>" + appNameStr + "</big>" +
+                    "<hr width=\"100%\" align=\"center\" size=\"1\"> <br>" +
+                    "This is a modification of the mobile version of Magic Cube 4D by Melinda Green. " +
+                    "The modification reorganises action bar menu, adds colour palette customisation, " +
+                    "allows to change view parameters (like in the desktop version) and offers alternative " +
+                    "twisting controls. It also offers three save slots with separate autosaves after each twist "+
+                    "as well as slots for manual saving to act as an emergency backup.<br>" +
+                    "Happy twisting! <br> - Cyan_Heron"
+                ;
+
+                DialogUtils.showHTMLDialog(this, html);
                 break;
             default:
                 break;
         }
         return true;
     } // end onOptionsItemSelected
+
+    private void updateMenuItemHandlers(int slot) {
+        mMenuItemManagerSave[0].update();
+        mMenuItemManagerLoad[0].update();
+        mMenuItemManagerSave[slot].update();
+        mMenuItemManagerLoad[slot].update();
+    }
 
     private void solve() {
         mScrambleState = ScrambleState.NONE; // User doesn't get credit for this solve.
@@ -468,8 +567,8 @@ public class MC4DAndroid extends AppCompatActivity {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        Toast.makeText(this, "CUSTOM MOD: Sending log", Toast.LENGTH_SHORT).show();
-        //EmailUtils.sendEmail(null, "MagicCube4D log file", text, this);
+        //Toast.makeText(this, "CUSTOM MOD: Sending log", Toast.LENGTH_SHORT).show();
+        EmailUtils.sendEmail(null, "MagicCube4D log file", text, this);
         return true;
     }
 

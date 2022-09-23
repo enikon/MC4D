@@ -52,7 +52,7 @@ public class MC4DPreferencesManager {
         this.onAdjustmentsChange = onAdjustmentsChange;
         this.onControlChange = onControlChange;
         this.gson = new Gson();
-        this.prefs = this.context.getSharedPreferences("mc4d", 0);
+        this.prefs = this.context.getSharedPreferences(MC4DConfig.APPNAME, 0);
 
         this.nameColor = new LinkedHashMap<>();
         this.defaultNameColor = new LinkedHashMap<>();

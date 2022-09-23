@@ -4,6 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MC4DConfig {
+
+    public static String APPNAME = "mc4d";
+
     public static enum FaceNames{
         FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, UPPER, LOWER
     }
@@ -118,6 +121,9 @@ public class MC4DConfig {
         controlsToControlsPrefTag = new LinkedHashMap<>();
         controlsToControlsPrefTag.put(Controls.AMT, "advanced_control_settings");
     }
+
+    public static int numberOfSaveSlots = 3;
+    public static String currentSaveSlotToPrefTag = "current_save_slot";
 
     //faceshrink stickershrink scale eyew
 

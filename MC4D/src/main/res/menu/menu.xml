@@ -2,20 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="Save" android:id="@+id/save">
         <menu>
-            <item android:title="Save: Slot 1" android:id="@+id/save_slot_1"></item>
-            <item android:title="Save: Slot 2" android:id="@+id/save_slot_2"></item>
-            <item android:title="Save: Slot 3" android:id="@+id/save_slot_3"></item>
-            <item android:title="Save: Slot 4" android:id="@+id/save_slot_4"></item>
-            <item android:title="Save: Slot 5" android:id="@+id/save_slot_5"></item>
+            <item android:title="Save:      ******" android:id="@+id/save_manual"></item>
+            <item android:title="Save as: Slot 1" android:id="@+id/save_slot_1"></item>
+            <item android:title="Save as: Slot 2" android:id="@+id/save_slot_2"></item>
+            <item android:title="Save as: Slot 3" android:id="@+id/save_slot_3"></item>
         </menu>
     </item>
     <item android:title="Load" android:id="@+id/load">
         <menu>
-            <item android:title="Load: Slot 1" android:id="@+id/load_slot_1"></item>
-            <item android:title="Load: Slot 2" android:id="@+id/load_slot_2"></item>
-            <item android:title="Load: Slot 3" android:id="@+id/load_slot_3"></item>
-            <item android:title="Load: Slot 4" android:id="@+id/load_slot_4"></item>
-            <item android:title="Load: Slot 5" android:id="@+id/load_slot_5"></item>
+            <item android:title="Load manual:    ******" android:id="@+id/load_manual"></item>
+            <item android:title="Load autosave: Slot 1" android:id="@+id/load_slot_1"></item>
+            <item android:title="Load autosave: Slot 2" android:id="@+id/load_slot_2"></item>
+            <item android:title="Load autosave: Slot 3" android:id="@+id/load_slot_3"></item>
         </menu>
     </item>
     <item android:title="Scramble" android:id="@+id/scramble">
